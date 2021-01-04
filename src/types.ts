@@ -13,4 +13,5 @@ export interface RetroItem {
   voters: string[];
   created: number;
   createdBy: string;
+  authorName: string;
 }

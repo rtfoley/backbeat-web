@@ -86,7 +86,12 @@ function App() {
     const userUid: string = firebase.auth()?.currentUser?.uid;
 
     if (userUid !== null && userUid !== undefined) {
-      firestore.createRetroItem(text, column, firebase.auth().currentUser.uid);
+      firestore.createRetroItem(
+        text,
+        column,
+        firebase.auth().currentUser.uid,
+        firebase.auth().currentUser.displayName
+      );
     }
   };
 
