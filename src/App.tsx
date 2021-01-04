@@ -46,8 +46,7 @@ function App() {
     return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
   }, []);
 
-  // Use an effect hook to subscribe to the grocery list item stream and
-  // automatically unsubscribe when the component unmounts.
+  // Listen for datastore changes
   useEffect(() => {
     const unsubscribe = firestore.streamRetroItems({
       next: (querySnapshot: any) => {
@@ -61,8 +60,14 @@ function App() {
       error: () => setError("Failed to get data, probably exceeded quota"),
     });
     return unsubscribe;
+
+    // TODO remove these dependencies, to avoid running this more than necessary
   }, [firestore, setRetroItems, setError]);
 
+  /**
+   * Input component for the new retro items
+   * @param handleSubmit
+   */
   const itemInput = (handleSubmit: (value: string) => void) => {
     return (
       <Form
@@ -83,6 +88,11 @@ function App() {
     );
   };
 
+  /**
+   * Handle when a new item is submitted
+   * @param column
+   * @param text
+   */
   const handleNewItem = (column: Columns, text: string) => {
     const userUid: string = firebase.auth()?.currentUser?.uid;
 
@@ -96,10 +106,15 @@ function App() {
     }
   };
 
+  /**
+   * Handle when a new item needs to be published
+   * @param item
+   */
   const handlePublishItem = (item: RetroItem) => {
     firestore.publishRetroItem(item.id);
   };
 
+  // Return the auth page if the user hasn't signed in
   if (!isSignedIn) {
     return (
       <div>
