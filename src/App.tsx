@@ -76,9 +76,16 @@ function App() {
     );
   }
 
-  const itemInput = (handleSubmit: (event: any) => void) => {
+  const itemInput = (handleSubmit: (value: string) => void) => {
     return (
-      <Form inline onSubmit={handleSubmit}>
+      <Form
+        inline
+        onSubmit={(event: any) => {
+          event.preventDefault();
+          handleSubmit(event.target[0].value);
+          event.target[0].value = "";
+        }}
+      >
         <Form.Group controlId="formBasicItem" className="mr-2">
           <Form.Control type="text" placeholder="Enter your retro item" />
         </Form.Group>
@@ -116,11 +123,7 @@ function App() {
       <Row>
         <Col>
           <h1>Liked</h1>
-          {itemInput((event: any) => {
-            event.preventDefault();
-            handleNewItem(Columns.LIKED, event.target[0].value);
-            event.target[0].value = "";
-          })}
+          {itemInput((value: string) => handleNewItem(Columns.LIKED, value))}
         </Col>
         <Col>
           <h1>Learned</h1>
