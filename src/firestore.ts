@@ -1,4 +1,4 @@
-import { RetroItem } from "./types";
+import { Columns, RetroItem } from "./types";
 
 const useFirestore = (firebase: any) => {
   const db = firebase.firestore();
@@ -7,15 +7,19 @@ const useFirestore = (firebase: any) => {
     return db.collection("retroItems").get();
   };
 
-  const createRetroItem = (retroItem: RetroItem) => {
+  const createRetroItem = (text: string, column: Columns, userUid: string) => {
     return db.collection("retroItems").add({
-      ...retroItem,
+      text: text,
+      column: column,
+      isPublished: false,
+      voters: [],
+      createdBy: userUid,
       created: firebase.firestore.FieldValue.serverTimestamp(),
     });
   };
 
   const streamRetroItems = (observer: any) => {
-    return db.collection("RetroItems").orderBy("created").onSnapshot(observer);
+    return db.collection("retroItems").orderBy("created").onSnapshot(observer);
   };
 
   return {

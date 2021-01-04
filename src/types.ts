@@ -6,6 +6,7 @@ export enum Columns {
 }
 
 export interface RetroItem {
+  id: number;
   text: string;
   column: Columns;
   isPublished: boolean;

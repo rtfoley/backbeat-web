@@ -22,25 +22,7 @@ function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
   const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
 
-  /*
   const firestore = useFirestore(firebase);
-
-  // Use an effect hook to subscribe to the grocery list item stream and
-  // automatically unsubscribe when the component unmounts.
-  useEffect(() => {
-    const unsubscribe = firestore.streamRetroItems({
-      next: (querySnapshot: any) => {
-        const updatedItems = querySnapshot.docs.map((docSnapshot: any) =>
-          docSnapshot.data()
-        );
-
-        setRetroItems(updatedItems);
-      },
-      error: () => console.log("failed to get data"),
-    });
-    return unsubscribe;
-  }, [firestore, setRetroItems]);
-  */
 
   // Configure FirebaseUI.
   const uiConfig = {
@@ -63,18 +45,22 @@ function App() {
     return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
   }, []);
 
-  if (!isSignedIn) {
-    return (
-      <div>
-        <h1>My App</h1>
-        <p>Please sign-in:</p>
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebase.auth()}
-        />
-      </div>
-    );
-  }
+  // Use an effect hook to subscribe to the grocery list item stream and
+  // automatically unsubscribe when the component unmounts.
+  useEffect(() => {
+    const unsubscribe = firestore.streamRetroItems({
+      next: (querySnapshot: any) => {
+        const updatedItems = querySnapshot.docs.map((docSnapshot: any) => ({
+          id: docSnapshot.id,
+          ...docSnapshot.data(),
+        }));
+
+        setRetroItems(updatedItems);
+      },
+      error: () => console.log("failed to get data"),
+    });
+    return unsubscribe;
+  }, [firestore, setRetroItems]);
 
   const itemInput = (handleSubmit: (value: string) => void) => {
     return (
@@ -97,18 +83,25 @@ function App() {
   };
 
   const handleNewItem = (column: Columns, text: string) => {
-    setRetroItems((previous: RetroItem[]) => [
-      ...previous,
-      {
-        text: text,
-        column: column,
-        isPublished: false,
-        voters: [],
-        created: Date.now(),
-        createdBy: firebase.auth()?.currentUser?.uid ?? "test",
-      },
-    ]);
+    const userUid: string = firebase.auth()?.currentUser?.uid;
+
+    if (userUid !== null && userUid !== undefined) {
+      firestore.createRetroItem(text, column, firebase.auth().currentUser.uid);
+    }
   };
+
+  if (!isSignedIn) {
+    return (
+      <div>
+        <h1>My App</h1>
+        <p>Please sign-in:</p>
+        <StyledFirebaseAuth
+          uiConfig={uiConfig}
+          firebaseAuth={firebase.auth()}
+        />
+      </div>
+    );
+  }
 
   return (
     <Container fluid>
