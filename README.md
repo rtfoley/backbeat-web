@@ -5,16 +5,17 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 A proof-of-concept app for conducting sprint retrospectives, powered by React and Firebase.
 
 To-do list
-[x] Sign-in/ auth
-[x] Add items
-[x] Publish items
-[ ] Vote on items
-[ ] Clean up the UI
-[ ] Start a new retro
-[ ] Share retro link with others (unique room ID type thing)
-[ ] Room passcodes?
-[ ] Sort by votes
-[ ] Add discussion notes
+
+- [x] Sign-in/ auth
+- [x] Add items
+- [x] Publish items
+- [ ] Vote on items
+- [ ] Clean up the UI
+- [ ] Start a new retro
+- [ ] Share retro link with others (unique room ID type thing)
+- [ ] Room passcodes?
+- [ ] Sort by votes
+- [ ] Add discussion notes
 
 ## Available Scripts
 
