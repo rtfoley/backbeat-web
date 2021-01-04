@@ -7,6 +7,7 @@ import { RetroItemGridProps } from "./types";
 const RetroItemGrid: React.FC<RetroItemGridProps> = ({
   items,
   showUnpublished,
+  onPublish,
 }) => {
   const filteredItems: RetroItem[] = items.filter(
     (item: RetroItem) => item.isPublished !== showUnpublished
@@ -14,10 +15,26 @@ const RetroItemGrid: React.FC<RetroItemGridProps> = ({
 
   return (
     <Row>
-      <RetroItemList items={filteredItems} column={Columns.LIKED} />
-      <RetroItemList items={filteredItems} column={Columns.LEARNED} />
-      <RetroItemList items={filteredItems} column={Columns.LACKED} />
-      <RetroItemList items={filteredItems} column={Columns.LONGED_FOR} />
+      <RetroItemList
+        items={filteredItems}
+        column={Columns.LIKED}
+        onPublish={onPublish}
+      />
+      <RetroItemList
+        items={filteredItems}
+        column={Columns.LEARNED}
+        onPublish={onPublish}
+      />
+      <RetroItemList
+        items={filteredItems}
+        column={Columns.LACKED}
+        onPublish={onPublish}
+      />
+      <RetroItemList
+        items={filteredItems}
+        column={Columns.LONGED_FOR}
+        onPublish={onPublish}
+      />
     </Row>
   );
 };

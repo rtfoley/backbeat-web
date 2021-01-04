@@ -95,6 +95,10 @@ function App() {
     }
   };
 
+  const handlePublishItem = (item: RetroItem) => {
+    firestore.publishRetroItem(item.id);
+  };
+
   if (!isSignedIn) {
     return (
       <div>
@@ -138,7 +142,14 @@ function App() {
           <h4 className="my-2">Unpublished</h4>
         </Col>
       </Row>
-      <RetroItemGrid items={retroItems} showUnpublished={true} />
+      <RetroItemGrid
+        items={retroItems.filter(
+          (item: RetroItem) =>
+            item.createdBy === firebase.auth()?.currentUser?.uid
+        )}
+        showUnpublished={true}
+        onPublish={handlePublishItem}
+      />
       <Row>
         <Col>
           <h4 className="my-2">Everyone's</h4>

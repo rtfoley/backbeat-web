@@ -25,7 +25,7 @@ const useFirestore = (firebase: any) => {
   };
 
   const publishRetroItem = (id: number) => {
-    return db.collection("retroItems").doc(id).set({
+    return db.collection("retroItems").doc(id).update({
       isPublished: true,
     });
   };
@@ -38,6 +38,7 @@ const useFirestore = (firebase: any) => {
     getRetroItems,
     createRetroItem,
     streamRetroItems,
+    publishRetroItem,
   };
 };
 
