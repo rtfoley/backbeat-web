@@ -1,5 +1,5 @@
 export enum Columns {
-  LIKE = "LIKE",
+  LIKED = "LIKED",
   LEARNED = "LEARNED",
   LACKED = "LACKED",
   LONGED_FOR = "LONGED_FOR",
@@ -8,7 +8,8 @@ export enum Columns {
 export interface RetroItem {
   text: string;
   column: Columns;
-  author: string;
   isPublished: boolean;
   voters: string[];
+  created: number;
+  createdBy: string;
 }

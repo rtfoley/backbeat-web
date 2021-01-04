@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Columns, RetroItem } from "./types";
 import RetroItemGrid from "./Components/RetroItemGrid";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase";
+import useFirestore from "./firestore";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,37 +20,27 @@ firebase.initializeApp(firebaseConfig);
 
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
+  const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
 
-  const testItems: RetroItem[] = [
-    {
-      text: "Something Tester1 liked",
-      column: Columns.LIKE,
-      author: "Tester1",
-      isPublished: false,
-      voters: [],
-    },
-    {
-      text: "Something Tester2 learned",
-      column: Columns.LEARNED,
-      author: "Tester2",
-      isPublished: true,
-      voters: [],
-    },
-    {
-      text: "Something Tester3 lacked",
-      column: Columns.LACKED,
-      author: "Tester3",
-      isPublished: true,
-      voters: [],
-    },
-    {
-      text: "Something Tester4 longed-for",
-      column: Columns.LONGED_FOR,
-      author: "Tester4",
-      isPublished: false,
-      voters: [],
-    },
-  ];
+  /*
+  const firestore = useFirestore(firebase);
+
+  // Use an effect hook to subscribe to the grocery list item stream and
+  // automatically unsubscribe when the component unmounts.
+  useEffect(() => {
+    const unsubscribe = firestore.streamRetroItems({
+      next: (querySnapshot: any) => {
+        const updatedItems = querySnapshot.docs.map((docSnapshot: any) =>
+          docSnapshot.data()
+        );
+
+        setRetroItems(updatedItems);
+      },
+      error: () => console.log("failed to get data"),
+    });
+    return unsubscribe;
+  }, [firestore, setRetroItems]);
+  */
 
   // Configure FirebaseUI.
   const uiConfig = {
@@ -85,6 +76,33 @@ function App() {
     );
   }
 
+  const itemInput = (handleSubmit: (event: any) => void) => {
+    return (
+      <Form inline onSubmit={handleSubmit}>
+        <Form.Group controlId="formBasicItem" className="mr-2">
+          <Form.Control type="text" placeholder="Enter your retro item" />
+        </Form.Group>
+        <Button variant="primary" type="submit">
+          Add
+        </Button>
+      </Form>
+    );
+  };
+
+  const handleNewItem = (column: Columns, text: string) => {
+    setRetroItems((previous: RetroItem[]) => [
+      ...previous,
+      {
+        text: text,
+        column: column,
+        isPublished: false,
+        voters: [],
+        created: Date.now(),
+        createdBy: firebase.auth()?.currentUser?.uid ?? "test",
+      },
+    ]);
+  };
+
   return (
     <Container fluid>
       <Row>
@@ -97,9 +115,12 @@ function App() {
       </Row>
       <Row>
         <Col>
-          <h1>
-            Liked <Button>Add</Button>
-          </h1>
+          <h1>Liked</h1>
+          {itemInput((event: any) => {
+            event.preventDefault();
+            handleNewItem(Columns.LIKED, event.target[0].value);
+            event.target[0].value = "";
+          })}
         </Col>
         <Col>
           <h1>Learned</h1>
@@ -116,13 +137,13 @@ function App() {
           <h4 className="my-2">Unpublished</h4>
         </Col>
       </Row>
-      <RetroItemGrid items={testItems} showUnpublished={true} />
+      <RetroItemGrid items={retroItems} showUnpublished={true} />
       <Row>
         <Col>
           <h4 className="my-2">Everyone's</h4>
         </Col>
       </Row>
-      <RetroItemGrid items={testItems} showUnpublished={false} />
+      <RetroItemGrid items={retroItems} showUnpublished={false} />
     </Container>
   );
 }
