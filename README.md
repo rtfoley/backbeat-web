@@ -14,6 +14,7 @@ To-do list
 - [ ] Start a new retro
 - [ ] Share retro link with others (unique room ID type thing)
 - [ ] Room passcodes?
+- [ ] See old retro data
 - [ ] Sort by votes
 - [ ] Add discussion notes
 
