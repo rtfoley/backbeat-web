@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Columns, RetroItem } from "./types";
 import RetroItemGrid from "./Components/RetroItemGrid";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
@@ -21,6 +21,7 @@ firebase.initializeApp(firebaseConfig);
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
   const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
+  const [error, setError] = useState<string>("");
 
   const firestore = useFirestore(firebase);
 
@@ -57,10 +58,10 @@ function App() {
 
         setRetroItems(updatedItems);
       },
-      error: () => console.log("failed to get data"),
+      error: () => setError("Failed to get data, probably exceeded quota"),
     });
     return unsubscribe;
-  }, [firestore, setRetroItems]);
+  }, [firestore, setRetroItems, setError]);
 
   const itemInput = (handleSubmit: (value: string) => void) => {
     return (
@@ -122,24 +123,36 @@ function App() {
           </Button>
         </Col>
       </Row>
-      <Row>
+      {error.length > 0 ? (
+        <Row className="my-2">
+          <Col>
+            <Alert variant="danger">{error}</Alert>
+          </Col>
+        </Row>
+      ) : null}
+      <Row className="mb-4">
         <Col>
           <h1>Liked</h1>
           {itemInput((value: string) => handleNewItem(Columns.LIKED, value))}
         </Col>
         <Col>
           <h1>Learned</h1>
+          {itemInput((value: string) => handleNewItem(Columns.LEARNED, value))}
         </Col>
         <Col>
           <h1>Lacked</h1>
+          {itemInput((value: string) => handleNewItem(Columns.LACKED, value))}
         </Col>
         <Col>
           <h1>Longed-For</h1>
+          {itemInput((value: string) =>
+            handleNewItem(Columns.LONGED_FOR, value)
+          )}
         </Col>
       </Row>
-      <Row>
+      <Row className="mt-4">
         <Col>
-          <h4 className="my-2">Unpublished</h4>
+          <h4>Unpublished</h4>
         </Col>
       </Row>
       <RetroItemGrid
@@ -150,7 +163,7 @@ function App() {
         showUnpublished={true}
         onPublish={handlePublishItem}
       />
-      <Row>
+      <Row className="mt-4">
         <Col>
           <h4 className="my-2">Everyone's</h4>
         </Col>
