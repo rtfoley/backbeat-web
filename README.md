@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# backbeat
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+A proof-of-concept app for conducting sprint retrospectives, powered by React and Firebase.
 
 ## Available Scripts
 
