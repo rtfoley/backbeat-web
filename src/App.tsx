@@ -106,9 +106,9 @@ function App() {
   return (
     <Container fluid>
       <Row>
-        <Col xs={11}>Welcome {firebase.auth()?.currentUser?.displayName}!</Col>
+        <Col xs={11}>Welcome {user?.displayName}!</Col>
         <Col>
-          <Button className="my-2" onClick={() => firebase.auth().signOut()}>
+          <Button className="my-2" onClick={() => auth().signOut()}>
             Sign Out
           </Button>
         </Col>
