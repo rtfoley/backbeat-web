@@ -6,6 +6,7 @@ A proof-of-concept app for conducting sprint retrospectives, powered by React an
 
 To-do list
 
+Basic functionality
 - [x] Sign-in/ auth
 - [x] Add items
 - [x] Publish items
@@ -13,9 +14,12 @@ To-do list
 - [ ] Delete unpublished items
 - [ ] Vote on items
 - [ ] Clean up the UI
+- [ ] Optimize read/ writes
+- [ ] Clear the board (with confirmation)
+- [ ] Security: share retro link with others (unique room ID type thing), with passcodes?
+
+Advanced functionality
 - [ ] Start a new retro
-- [ ] Share retro link with others (unique room ID type thing)
-- [ ] Room passcodes?
 - [ ] See old retro data
 - [ ] Sort by votes
 - [ ] Add discussion notes
