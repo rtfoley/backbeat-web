@@ -1,70 +1,43 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./App.css";
-import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { Columns, RetroItem } from "./types";
 import RetroItemGrid from "./Components/RetroItemGrid";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import firebase from "firebase";
-import useFirestore from "./firestore";
-
-const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-};
-
-firebase.initializeApp(firebaseConfig);
+import {
+  useFirestore,
+  useFirestoreCollectionData,
+  useAuth,
+  useUser,
+} from "reactfire";
 
 function App() {
-  const [isSignedIn, setIsSignedIn] = useState(false); // Local signed-in state.
-  const [retroItems, setRetroItems] = useState<RetroItem[]>([]);
-  const [error, setError] = useState<string>("");
+  const auth = useAuth;
+  const { data: user } = useUser();
 
-  const firestore = useFirestore(firebase);
+  const firestore = useFirestore();
+  const retroItemsCollection = firestore.collection("retroItems");
+  const retroItemsQuery = retroItemsCollection.orderBy("created", "asc");
+  const { status, data: retroItems } = useFirestoreCollectionData(
+    retroItemsQuery,
+    {
+      idField: "id",
+    }
+  );
+
+  const serverTimestamp = useFirestore.FieldValue.serverTimestamp();
 
   // Configure FirebaseUI.
   const uiConfig = {
     // Popup signin flow rather than redirect flow.
     signInFlow: "popup",
-    signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
+    signInOptions: [auth.EmailAuthProvider.PROVIDER_ID],
     callbacks: {
       // Avoid redirects after sign-in.
       signInSuccessWithAuthResult: () => false,
     },
   };
-
-  // Listen to the Firebase Auth state and set the local state.
-  useEffect(() => {
-    const unregisterAuthObserver = firebase
-      .auth()
-      .onAuthStateChanged((user) => {
-        setIsSignedIn(!!user);
-      });
-    return () => unregisterAuthObserver(); // Make sure we un-register Firebase observers when the component unmounts.
-  }, []);
-
-  // Listen for datastore changes
-  useEffect(() => {
-    setError("");
-    const unsubscribe = firestore.streamRetroItems({
-      next: (querySnapshot: any) => {
-        const updatedItems = querySnapshot.docs.map((docSnapshot: any) => ({
-          id: docSnapshot.id,
-          ...docSnapshot.data(),
-        }));
-
-        setRetroItems(updatedItems);
-      },
-      error: () => setError("Failed to get data, probably exceeded quota"),
-    });
-
-    return unsubscribe;
-
-    // Firestore dep not included here, including it seems to cause reads to skyrocket
-  }, []);
 
   /**
    * Input component for the new retro items
@@ -96,15 +69,18 @@ function App() {
    * @param text
    */
   const handleNewItem = (column: Columns, text: string) => {
-    const userUid: string = firebase.auth()?.currentUser?.uid;
+    const userUid: string = user.uid;
 
     if (userUid !== null && userUid !== undefined) {
-      firestore.createRetroItem(
-        text,
-        column,
-        firebase.auth().currentUser.uid,
-        firebase.auth().currentUser.displayName
-      );
+      retroItemsCollection.add({
+        text: text,
+        column: column,
+        isPublished: false,
+        voters: [],
+        createdBy: userUid,
+        authorName: user.displayName,
+        created: serverTimestamp,
+      });
     }
   };
 
@@ -113,19 +89,16 @@ function App() {
    * @param item
    */
   const handlePublishItem = (item: RetroItem) => {
-    firestore.publishRetroItem(item.id);
+    retroItemsCollection.doc(item.id.toString()).update({ isPublished: true });
   };
 
   // Return the auth page if the user hasn't signed in
-  if (!isSignedIn) {
+  if (!user) {
     return (
       <div>
         <h1>My App</h1>
         <p>Please sign-in:</p>
-        <StyledFirebaseAuth
-          uiConfig={uiConfig}
-          firebaseAuth={firebase.auth()}
-        />
+        <StyledFirebaseAuth uiConfig={uiConfig} firebaseAuth={auth()} />
       </div>
     );
   }
@@ -140,13 +113,6 @@ function App() {
           </Button>
         </Col>
       </Row>
-      {error.length > 0 ? (
-        <Row className="my-2">
-          <Col>
-            <Alert variant="danger">{error}</Alert>
-          </Col>
-        </Row>
-      ) : null}
       <Row className="mb-4">
         <Col>
           <h1>Liked</h1>
@@ -173,9 +139,8 @@ function App() {
         </Col>
       </Row>
       <RetroItemGrid
-        items={retroItems.filter(
-          (item: RetroItem) =>
-            item.createdBy === firebase.auth()?.currentUser?.uid
+        items={retroItems?.filter(
+          (item: any) => item.createdBy === firebase.auth()?.currentUser?.uid
         )}
         showUnpublished={true}
         onPublish={handlePublishItem}

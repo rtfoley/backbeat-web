@@ -9,9 +9,9 @@ const RetroItemCard: React.FC<RetroItemCardProps> = ({ item, onPublish }) => {
 
   return (
     <Card className="mb-2 p-1">
-      <Card.Title>{item.text}</Card.Title>
-      <Card.Subtitle>{item.authorName ?? ""}</Card.Subtitle>
-      {!item.isPublished && onPublish ? (
+      <Card.Title>{item?.text}</Card.Title>
+      <Card.Subtitle>{item?.authorName ?? ""}</Card.Subtitle>
+      {!item?.isPublished && onPublish ? (
         <Button variant="primary" onClick={handlePublish}>
           Publish
         </Button>
