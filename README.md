@@ -4,7 +4,7 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 A proof-of-concept app for conducting sprint retrospectives, powered by React and Firebase.
 
-To-do list
+### To-do list
 
 Basic functionality
 - [x] Sign-in/ auth
