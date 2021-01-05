@@ -48,6 +48,7 @@ function App() {
 
   // Listen for datastore changes
   useEffect(() => {
+    setError("");
     const unsubscribe = firestore.streamRetroItems({
       next: (querySnapshot: any) => {
         const updatedItems = querySnapshot.docs.map((docSnapshot: any) => ({
