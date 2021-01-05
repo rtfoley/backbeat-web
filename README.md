@@ -9,6 +9,8 @@ To-do list
 - [x] Sign-in/ auth
 - [x] Add items
 - [x] Publish items
+- [ ] Edit unpublished items
+- [ ] Delete unpublished items
 - [ ] Vote on items
 - [ ] Clean up the UI
 - [ ] Start a new retro
