@@ -59,10 +59,11 @@ function App() {
       },
       error: () => setError("Failed to get data, probably exceeded quota"),
     });
+
     return unsubscribe;
 
-    // TODO remove these dependencies, to avoid running this more than necessary
-  }, [firestore, setRetroItems, setError]);
+    // Firestore dep not included here, including it seems to cause reads to skyrocket
+  }, []);
 
   /**
    * Input component for the new retro items
