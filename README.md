@@ -10,11 +10,11 @@ Basic functionality
 - [x] Sign-in/ auth
 - [x] Add items
 - [x] Publish items
+- [ ] Optimize read/ writes
 - [ ] Edit unpublished items
 - [ ] Delete unpublished items
 - [ ] Vote on items
 - [ ] Clean up the UI
-- [ ] Optimize read/ writes
 - [ ] Clear the board (with confirmation)
 - [ ] Security: share retro link with others (unique room ID type thing), with passcodes?
 
