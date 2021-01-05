@@ -1,7 +1,7 @@
 import { RetroItem } from "../../types";
 
 export interface RetroItemGridProps {
-  items: RetroItem[];
+  items: RetroItem[] | any[];
   showUnpublished: boolean;
   onPublish?: (item: RetroItem) => void;
 }

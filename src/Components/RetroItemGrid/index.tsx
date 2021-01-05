@@ -9,7 +9,7 @@ const RetroItemGrid: React.FC<RetroItemGridProps> = ({
   showUnpublished,
   onPublish,
 }) => {
-  const filteredItems: RetroItem[] = items.filter(
+  const filteredItems: RetroItem[] | any[] = items?.filter(
     (item: RetroItem) => item.isPublished !== showUnpublished
   );
 

@@ -12,7 +12,7 @@ const RetroItemList: React.FC<RetroItemListProps> = ({
   return (
     <Col>
       {items
-        .filter((item: RetroItem) => item.column === column)
+        ?.filter((item: RetroItem) => item.column === column)
         .map((item: RetroItem) => (
           <RetroItemCard key={item.id} item={item} onPublish={onPublish} />
         ))}
