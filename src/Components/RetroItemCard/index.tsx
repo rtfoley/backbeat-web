@@ -13,10 +13,17 @@ const RetroItemCard: React.FC<RetroItemCardProps> = ({ item, onPublish }) => {
       <br />
       {!item?.isPublished && onPublish ? (
         <ButtonToolbar>
-          <Button variant="primary" onClick={handlePublish} className="mr-2">
+          <Button variant="success" className="mr-2" onClick={handlePublish}>
             Publish
           </Button>
-          <Button variant="danger" onClick={() => null}>
+          <Button
+            variant="outline-primary"
+            className="mr-2"
+            onClick={() => null}
+          >
+            Edit
+          </Button>
+          <Button variant="outline-danger" onClick={() => null}>
             Delete
           </Button>
         </ButtonToolbar>
