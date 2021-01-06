@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import "./App.css";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Modal, Nav, Row } from "react-bootstrap";
 import { Columns, RetroItem } from "./types";
 import RetroItemGrid from "./Components/RetroItemGrid";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
@@ -28,6 +28,9 @@ function App() {
 
   const serverTimestamp = useFirestore.FieldValue.serverTimestamp();
 
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const currentColumn = useRef<Columns>();
+
   // Configure FirebaseUI.
   const uiConfig = {
     // Popup signin flow rather than redirect flow.
@@ -43,23 +46,18 @@ function App() {
    * Input component for the new retro items
    * @param handleSubmit
    */
-  const itemInput = (handleSubmit: (value: string) => void) => {
+  const itemInput = (column: Columns) => {
     return (
-      <Form
-        inline
-        onSubmit={(event: any) => {
-          event.preventDefault();
-          handleSubmit(event.target[0].value);
-          event.target[0].value = "";
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={() => {
+          currentColumn.current = column;
+          setShowModal(true);
         }}
       >
-        <Form.Group controlId="formBasicItem" className="mr-2">
-          <Form.Control type="text" placeholder="Enter your retro item" />
-        </Form.Group>
-        <Button variant="primary" type="submit">
-          Add
-        </Button>
-      </Form>
+        Add
+      </Button>
     );
   };
 
@@ -92,6 +90,17 @@ function App() {
     retroItemsCollection.doc(item.id.toString()).update({ isPublished: true });
   };
 
+  const handleModalSave = (event: any) => {
+    event.preventDefault();
+    handleNewItem(currentColumn.current, event.target[0].value);
+    event.target[0].value = "";
+    setShowModal(false);
+  };
+
+  const handleModalCancel = (event: any) => {
+    setShowModal(false);
+  };
+
   // Return the auth page if the user hasn't signed in
   if (!user) {
     return (
@@ -105,35 +114,52 @@ function App() {
 
   return (
     <Container fluid>
-      <Row>
-        <Col xs={11}>Welcome {user?.displayName}!</Col>
-        <Col>
-          <Button className="my-2" onClick={() => auth().signOut()}>
+      <Modal
+        show={showModal}
+        onHide={handleModalCancel}
+        backdrop="static"
+        animation={false}
+      >
+        <Modal.Header>
+          <Modal.Title>Add Retro Item</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleModalSave} className="m-2">
+          <Form.Group controlId="formBasicItem">
+            <Form.Control as="textarea" placeholder="Enter your retro item" />
+          </Form.Group>
+          <Button variant="primary" type="submit" className="mr-2">
+            Add
+          </Button>
+          <Button variant="secondary" onClick={handleModalCancel}>
+            Cancel
+          </Button>
+        </Form>
+      </Modal>
+      <Nav className="my-2 justify-content-end">
+        <Nav.Item className="mr-4">
+          <h3>Welcome {user?.displayName}!</h3>
+        </Nav.Item>
+        <Nav.Item>
+          <Button variant="outline-secondary" onClick={() => auth().signOut()}>
             Sign Out
           </Button>
+        </Nav.Item>
+      </Nav>
+      <Row className="mb-2">
+        <Col>
+          <h1>Liked {itemInput(Columns.LIKED)}</h1>
+        </Col>
+        <Col>
+          <h1>Learned {itemInput(Columns.LEARNED)}</h1>
+        </Col>
+        <Col>
+          <h1>Lacked {itemInput(Columns.LACKED)}</h1>
+        </Col>
+        <Col>
+          <h1>Longed-For {itemInput(Columns.LONGED_FOR)}</h1>
         </Col>
       </Row>
-      <Row className="mb-4">
-        <Col>
-          <h1>Liked</h1>
-          {itemInput((value: string) => handleNewItem(Columns.LIKED, value))}
-        </Col>
-        <Col>
-          <h1>Learned</h1>
-          {itemInput((value: string) => handleNewItem(Columns.LEARNED, value))}
-        </Col>
-        <Col>
-          <h1>Lacked</h1>
-          {itemInput((value: string) => handleNewItem(Columns.LACKED, value))}
-        </Col>
-        <Col>
-          <h1>Longed-For</h1>
-          {itemInput((value: string) =>
-            handleNewItem(Columns.LONGED_FOR, value)
-          )}
-        </Col>
-      </Row>
-      <Row className="mt-4">
+      <Row>
         <Col>
           <h4>Unpublished</h4>
         </Col>
